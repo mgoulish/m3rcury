@@ -2,7 +2,7 @@ package m3rcury
 
 import ( 
          "fmt"
-         "time"
+         "os"
        )
 
 var fp = fmt.Fprintf
@@ -20,27 +20,31 @@ type Message_Channel chan Message
 
 
 type M3rcury struct {
-  output_channel Message_Channel
+  input  Message_Channel
+  output Message_Channel
 }
 
 
 
-func Start_M3rcury ( ) ( Message_Channel ) {
-  out := make ( Message_Channel, 5 )
-  m3 := & M3rcury { output_channel : out }
-  go m3.run (  )
-  return out
+func Start_M3rcury ( ) ( in, out Message_Channel ) {
+  in  = make ( Message_Channel, 5 )
+  out = make ( Message_Channel, 5 )
+  m3 := & M3rcury { output : out,
+                    input  : in   }
+  go m3.listen (  )
+  return in, out
 }
 
 
 
 
-func ( m3 * M3rcury ) run ( ) {
 
-  for {
-    m3.output_channel <- Message { Type: "info",
-                                   Data: map[string]interface{} { "msg" : "M3rcury is running!"} }
-    time.Sleep ( 5 * time.Second )
+func ( m3 * M3rcury ) listen ( ) {
+  for { 
+    msg := <- m3.input
+    fp ( os.Stdout, "☿: received message: |%v|\n", msg )
+    m3.output <- Message { Type: "info",
+                           Data: map[string]interface{} { "msg" : "thanks"} }
   }
 }
 
