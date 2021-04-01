@@ -3,11 +3,12 @@ package m3rcury
 import ( 
          "fmt"
          "os"
+         "strings"
          "time"
        )
 
-var fp = fmt.Fprintf
-var mercury = '\u263F'
+var fp    = fmt.Fprintf
+var glyph = '\u263F'
 
 
 
@@ -29,6 +30,8 @@ type M3rcury struct {
   log_file   string
   start_time float64
 }
+
+
 
 
 
@@ -66,6 +69,7 @@ func ( m3 * M3rcury ) listen ( ) {
         m3.log_dir, _ = dir.(string)
         m3.log_file = m3.log_dir + "/m3rcury" 
         m3.make_log_dir ( )
+        m3.log ( "Started logging." )
     }
   }
 }
@@ -98,13 +102,26 @@ func ( m3 * M3rcury ) timestamp ( ) ( float64 ) {
 
 
 func ( m3 * M3rcury ) log ( format string, args ...interface{}) {
-  new_format := fmt.Sprintf ( "%c %.6f : %s\n", mercury, m3.timestamp(), format )
+  var file * os.File
+  new_format := fmt.Sprintf ( "%c %.6f : %s\n", glyph, m3.timestamp(), format )
 
-  // Open the log file, write this, then close it.
+  // Open the log file, if it already exists.
   file, err := os.Open ( m3.log_file )
   if err != nil {
-    fp ( os.Stdout, "MDEBUG log error:  |%s|\n", err.Error() )
-    os.Exit ( 1 )
+    // If it doesn't exist yet, create it.
+    if strings.Contains ( err.Error(), "no such file or directory" ) {
+      file, err = os.Create ( m3.log_file )
+      if err != nil {
+        fp ( os.Stdout, "%c.log error 1 |%s|\n", glyph, err.Error() )
+        os.Exit ( 1 )
+      } /*else {
+          file, err := os.Open ( m3.log_file )
+          if err != nil {
+            fp ( os.Stdout, "%c.log error 2 |%s|\n", glyph, err.Error()
+            os.Exit ( 1 )
+          }
+      } */
+    }
   }
   defer file.Close()
   fp ( file, new_format, args ... )

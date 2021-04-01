@@ -22,6 +22,9 @@ func main ( ) {
   m3rcury_input <- m3.Message { Type: "log",
                                 Data: map[string]interface{} { "dir" : "./log"} }
 
+  m3rcury_input <- m3.Message { Type: "box",
+                                Data: map[string]interface{} { "name" : "Brontonomicon"} }
+
   for { 
     msg := <- m3rcury_output
     fp ( os.Stdout, "Main received msg: |%v|\n", msg )
