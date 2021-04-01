@@ -1,0 +1,8 @@
+#! /bin/bash
+
+export M3RCURY_ROOT=${HOME}/m3rcury
+export GOPATH=${M3RCURY_ROOT}
+
+
+go run make_a_network.go
+
