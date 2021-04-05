@@ -1,4 +1,4 @@
-package m3rcury
+package M3rcury
 
 import ( 
          "fmt"
@@ -23,7 +23,7 @@ type Message_Channel chan Message
 
 
 
-type M3rcury struct {
+type m3rcury struct {
   input      Message_Channel
   output     Message_Channel
   log_dir    string
@@ -38,7 +38,7 @@ type M3rcury struct {
 func Start_M3rcury ( ) ( in, out Message_Channel ) {
   in  = make ( Message_Channel, 5 )
   out = make ( Message_Channel, 5 )
-  m3 := & M3rcury { output     : out,
+  m3 := & m3rcury { output     : out,
                     input      : in }
   go m3.listen (  )
 
@@ -53,7 +53,7 @@ func Start_M3rcury ( ) ( in, out Message_Channel ) {
 
 
 
-func ( m3 * M3rcury ) listen ( ) {
+func ( m3 * m3rcury ) listen ( ) {
   for { 
     msg := <- m3.input
     fp ( os.Stdout, "☿: received message: |%v|\n", msg )
@@ -68,8 +68,13 @@ func ( m3 * M3rcury ) listen ( ) {
         dir := msg.Data["dir"]
         m3.log_dir, _ = dir.(string)
         m3.log_file = m3.log_dir + "/m3rcury" 
-        m3.make_log_dir ( )
-        m3.log ( "Started logging." )
+        m3.make_log_dirs ( )
+        m3.log ( "start" )
+      
+       case "box" :
+         name := msg.Data["name"]
+         new_box ( name.(string), m3.log_dir + "/boxes", m3.start_time ) 
+
     }
   }
 }
@@ -78,8 +83,19 @@ func ( m3 * M3rcury ) listen ( ) {
 
 
 
-func ( m3 * M3rcury ) make_log_dir ( ) {
-  err := os.Mkdir ( m3.log_dir, 0744 )
+func ( m3 * m3rcury ) make_log_dirs ( ) {
+
+  // My log dir ----------------------------------
+  err := find_or_make_dir ( m3.log_dir )
+  if err != nil {
+    // Already existing is not an error.
+    if ! strings.Contains ( err.Error(), "exists" ) {
+      m3.output <- Message { Type: "error",
+                             Data: map[string]interface{} { "err" : err.Error() } }
+    }
+  }
+  // the Boxes ----------------------------------
+  err = find_or_make_dir ( m3.log_dir + "/boxes" )
   if err != nil {
     m3.output <- Message { Type: "error",
                            Data: map[string]interface{} { "err" : err.Error() } }
@@ -90,7 +106,22 @@ func ( m3 * M3rcury ) make_log_dir ( ) {
 
 
 
-func ( m3 * M3rcury ) timestamp ( ) ( float64 ) {
+func find_or_make_dir ( dir string ) ( err error ) {
+  err = os.Mkdir ( dir, 0744 )
+  if err != nil {
+    // Already existing is not an error.
+    if ! strings.Contains ( err.Error(), "exists" ) {
+      return err
+    }
+  }
+  return nil
+}
+
+
+
+
+
+func ( m3 * m3rcury ) timestamp ( ) ( float64 ) {
   now     := time.Now()
   seconds := float64 ( now.UnixNano() ) / 1000000000
 
@@ -101,7 +132,7 @@ func ( m3 * M3rcury ) timestamp ( ) ( float64 ) {
 
 
 
-func ( m3 * M3rcury ) log ( format string, args ...interface{}) {
+func ( m3 * m3rcury ) log ( format string, args ...interface{}) {
   var file * os.File
   new_format := fmt.Sprintf ( "%c %.6f : %s\n", glyph, m3.timestamp(), format )
 
@@ -114,13 +145,7 @@ func ( m3 * M3rcury ) log ( format string, args ...interface{}) {
       if err != nil {
         fp ( os.Stdout, "%c.log error 1 |%s|\n", glyph, err.Error() )
         os.Exit ( 1 )
-      } /*else {
-          file, err := os.Open ( m3.log_file )
-          if err != nil {
-            fp ( os.Stdout, "%c.log error 2 |%s|\n", glyph, err.Error()
-            os.Exit ( 1 )
-          }
-      } */
+      }
     }
   }
   defer file.Close()
