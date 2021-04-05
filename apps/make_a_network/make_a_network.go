@@ -17,10 +17,7 @@ var fp = fmt.Fprintf
 
 func main ( ) {
 
-  m3rcury_input, m3rcury_output := m3.Start_M3rcury ( )
-
-  m3rcury_input <- m3.Message { Type: "log",
-                                Data: map[string]interface{} { "dir" : "./log"} }
+  m3rcury_input, m3rcury_output := m3.Start_M3rcury ( "./log" )
 
   m3rcury_input <- m3.Message { Type: "box",
                                 Data: map[string]interface{} { "name" : "Brontonomicon"} }
