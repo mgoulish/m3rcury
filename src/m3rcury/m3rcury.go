@@ -23,24 +23,35 @@ type Message_Channel chan Message
 
 
 
+// Mercury's view of a Box.
+type m3_box struct {
+  name string
+  input, output Message_Channel
+}
+
+
+
 type m3rcury struct {
   input      Message_Channel
   output     Message_Channel
   log_dir    string
   log_file   string
   start_time float64
+  boxes      map [ string ] m3_box 
+  local_box  string
 }
 
 
 
 
 
-func Start_M3rcury ( log_dir string ) ( in, out Message_Channel ) {
+func Start_M3rcury ( local_box string, log_dir string ) ( in, out Message_Channel ) {
   in  = make ( Message_Channel, 5 )
   out = make ( Message_Channel, 5 )
   m3 := & m3rcury { output     : out,
                     input      : in,
                     log_dir    : log_dir,
+                    local_box  : local_box,
                   }
   m3.log_file = m3.log_dir + "/m3rcury"
   now     := time.Now()
@@ -49,7 +60,6 @@ func Start_M3rcury ( log_dir string ) ( in, out Message_Channel ) {
   m3.make_log_dirs ( )
 
   go m3.listen (  )
-
 
   return in, out
 }
@@ -90,17 +100,15 @@ func ( m3 * m3rcury ) make_log_dirs ( ) {
   if err != nil {
     // Already existing is not an error.
     if ! strings.Contains ( err.Error(), "exists" ) {
-      fp ( os.Stdout, "MDEBUG here 1\n")
       m3.output <- Message { Type: "error",
                              Data: map[string]interface{} { "err" : err.Error() } }
     }
   }
-  m3.log ( "start" )
+  m3.log ( "start on %s", m3.local_box )
 
   // the Boxes ----------------------------------
   err = find_or_make_dir ( m3.log_dir + "/boxes" )
   if err != nil {
-      fp ( os.Stdout, "MDEBUG here 2\n")
     m3.output <- Message { Type: "error",
                            Data: map[string]interface{} { "err" : err.Error() } }
   }
@@ -115,7 +123,6 @@ func find_or_make_dir ( dir string ) ( err error ) {
   if err != nil {
     // Already existing is not an error.
     if ! strings.Contains ( err.Error(), "exists" ) {
-      fp ( os.Stdout, "MDEBUG here 3\n")
       return err
     }
   }
@@ -126,11 +133,17 @@ func find_or_make_dir ( dir string ) ( err error ) {
 
 
 
-func ( m3 * m3rcury ) timestamp ( ) ( float64 ) {
+func timestamp ( ) ( float64 ) {
   now     := time.Now()
-  seconds := float64 ( now.UnixNano() ) / 1000000000
+  return float64 ( now.UnixNano() ) / 1000000000
+}
 
-  return seconds - m3.start_time
+
+
+
+
+func ( m3 * m3rcury ) timestamp ( ) ( float64 ) {
+  return timestamp() - m3.start_time
 }
 
 

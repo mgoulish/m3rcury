@@ -28,8 +28,6 @@ func new_box ( name, root_log_dir string, start_time float64 ) ( in, out Message
   in  = make ( Message_Channel, 5 )
   out = make ( Message_Channel, 5 )
 
-  fp ( os.Stdout, "MDEBUG Making new box |%s|\n", name )
-
   b := & box { output     : out,
                input      : in,
                name       : name,
@@ -75,6 +73,15 @@ func ( b * box ) make_log_dirs ( ) {
 
 
 
+func timestamp ( ) ( float64 ) {
+  now     := time.Now()
+  return float64 ( now.UnixNano() ) / 1000000000
+}
+
+
+
+
+
 func ( b * box ) timestamp ( ) ( float64 ) {
   now     := time.Now()
   seconds := float64 ( now.UnixNano() ) / 1000000000
@@ -88,7 +95,7 @@ func ( b * box ) timestamp ( ) ( float64 ) {
 
 func ( b * box ) log ( format string, args ...interface{}) {
   var file * os.File
-  new_format := fmt.Sprintf ( "%c %.6f : %s\n", glyph, b.timestamp(), format )
+  new_format := fmt.Sprintf ( "%s %.6f : %s\n", b.name, b.timestamp(), format )
 
   // Open the log file, if it already exists.
   file, err := os.Open ( b.log_file )

@@ -17,10 +17,13 @@ var fp = fmt.Fprintf
 
 func main ( ) {
 
-  m3rcury_input, m3rcury_output := m3.Start_M3rcury ( "./log" )
+  m3rcury_input, m3rcury_output := m3.Start_M3rcury ( "Brontonomicon", "./log" )
 
   m3rcury_input <- m3.Message { Type: "box",
                                 Data: map[string]interface{} { "name" : "Brontonomicon"} }
+
+  m3rcury_input <- m3.Message { Type: "box",
+                                Data: map[string]interface{} { "name" : "Colossus-Guardian"} }
 
   for { 
     msg := <- m3rcury_output
