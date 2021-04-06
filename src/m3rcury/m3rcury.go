@@ -37,7 +37,7 @@ type m3rcury struct {
   log_dir    string
   log_file   string
   start_time float64
-  boxes      map [ string ] m3_box 
+  boxes      map [ string ] * m3_box 
   local_box  string
 }
 
@@ -52,6 +52,7 @@ func Start_M3rcury ( local_box string, log_dir string ) ( in, out Message_Channe
                     input      : in,
                     log_dir    : log_dir,
                     local_box  : local_box,
+                    boxes      : make ( map [ string ] * m3_box ),
                   }
   m3.log_file = m3.log_dir + "/m3rcury"
   now     := time.Now()
@@ -81,7 +82,14 @@ func ( m3 * m3rcury ) listen ( ) {
       
        case "box" :
          name := msg.Data["name"]
-         new_box ( name.(string), m3.log_dir + "/boxes", m3.start_time ) 
+         name_str := name.(string)
+         box_in, box_out := new_box ( name_str, m3.log_dir + "/boxes", m3.start_time ) 
+         box := & m3_box { name   : name_str,
+                           input  : box_in,
+                           output : box_out,
+                         }
+         m3.boxes [ name_str ] = box
+         fp ( os.Stdout, "MDEBUG m3rcury now has %d boxes.\n", len ( m3.boxes ) )
 
        default:
          fp ( os.Stdout, "%c : unknown command: |%s|\n", glyph, msg.Type )

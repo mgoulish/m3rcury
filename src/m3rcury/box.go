@@ -73,15 +73,6 @@ func ( b * box ) make_log_dirs ( ) {
 
 
 
-func timestamp ( ) ( float64 ) {
-  now     := time.Now()
-  return float64 ( now.UnixNano() ) / 1000000000
-}
-
-
-
-
-
 func ( b * box ) timestamp ( ) ( float64 ) {
   now     := time.Now()
   seconds := float64 ( now.UnixNano() ) / 1000000000
