@@ -25,6 +25,11 @@ func main ( ) {
   m3rcury_input <- m3.Message { Type: "box",
                                 Data: map[string]interface{} { "name" : "Colossus-Guardian"} }
 
+  m3rcury_input <- m3.Message { Type: "network",
+                                Data: map[string]interface{} { "name"              : "fastwalker",
+                                                               "Brontonomicon"     : "10.10.10.1",
+                                                               "Colossus-Guardian" : "10.10.10.2" } }
+
   for { 
     msg := <- m3rcury_output
     fp ( os.Stdout, "Main received msg: |%v|\n", msg )

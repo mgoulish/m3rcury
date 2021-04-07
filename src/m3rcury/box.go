@@ -4,7 +4,6 @@ import (
          "fmt"
          "os"
          "strings"
-         "time"
        )
 
 
@@ -74,10 +73,7 @@ func ( b * box ) make_log_dirs ( ) {
 
 
 func ( b * box ) timestamp ( ) ( float64 ) {
-  now     := time.Now()
-  seconds := float64 ( now.UnixNano() ) / 1000000000
-
-  return seconds - b.start_time
+  return timestamp() - b.start_time
 }
 
 

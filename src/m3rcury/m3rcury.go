@@ -89,7 +89,11 @@ func ( m3 * m3rcury ) listen ( ) {
                            output : box_out,
                          }
          m3.boxes [ name_str ] = box
-         fp ( os.Stdout, "MDEBUG m3rcury now has %d boxes.\n", len ( m3.boxes ) )
+         m3.log ( "made box %s", name_str )
+
+       case "network" :
+         
+         new_network ( m3.log_dir + "/networks", msg, m3.start_time )
 
        default:
          fp ( os.Stdout, "%c : unknown command: |%s|\n", glyph, msg.Type )
@@ -116,6 +120,13 @@ func ( m3 * m3rcury ) make_log_dirs ( ) {
 
   // the Boxes ----------------------------------
   err = find_or_make_dir ( m3.log_dir + "/boxes" )
+  if err != nil {
+    m3.output <- Message { Type: "error",
+                           Data: map[string]interface{} { "err" : err.Error() } }
+  }
+
+  // the Networks ----------------------------------
+  err = find_or_make_dir ( m3.log_dir + "/networks" )
   if err != nil {
     m3.output <- Message { Type: "error",
                            Data: map[string]interface{} { "err" : err.Error() } }
