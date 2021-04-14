@@ -84,7 +84,7 @@ func ( n * network ) make_log_dirs ( ) {
 
 func ( n * network ) log ( format string, args ...interface{}) {
   var file * os.File
-  new_format := fmt.Sprintf ( "%s %.6f : %s\n", n.name, n.timestamp(), format )
+  new_format := fmt.Sprintf ( "network %s %.6f : %s\n", n.name, n.timestamp(), format )
 
   // Open the log file, if it already exists.
   file, err := os.Open ( n.log_file )

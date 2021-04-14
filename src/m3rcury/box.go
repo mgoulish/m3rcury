@@ -82,7 +82,7 @@ func ( b * box ) timestamp ( ) ( float64 ) {
 
 func ( b * box ) log ( format string, args ...interface{}) {
   var file * os.File
-  new_format := fmt.Sprintf ( "%s %.6f : %s\n", b.name, b.timestamp(), format )
+  new_format := fmt.Sprintf ( "box %s %.6f : %s\n", b.name, b.timestamp(), format )
 
   // Open the log file, if it already exists.
   file, err := os.Open ( b.log_file )

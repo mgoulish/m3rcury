@@ -30,6 +30,9 @@ func main ( ) {
                                                                "Brontonomicon"     : "10.10.10.1",
                                                                "Colossus-Guardian" : "10.10.10.2" } }
 
+  m3rcury_input <- m3.Message { Type: "router",
+                                Data: map[string]interface{} { "ID" : "A" } }
+
   for { 
     msg := <- m3rcury_output
     fp ( os.Stdout, "Main received msg: |%v|\n", msg )

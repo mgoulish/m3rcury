@@ -92,8 +92,10 @@ func ( m3 * m3rcury ) listen ( ) {
          m3.log ( "made box %s", name_str )
 
        case "network" :
-         
          new_network ( m3.log_dir + "/networks", msg, m3.start_time )
+
+       case "router" :
+         new_router ( m3.log_dir + "/routers",   msg, m3.start_time )
 
        default:
          fp ( os.Stdout, "%c : unknown command: |%s|\n", glyph, msg.Type )
@@ -114,6 +116,7 @@ func ( m3 * m3rcury ) make_log_dirs ( ) {
     if ! strings.Contains ( err.Error(), "exists" ) {
       m3.output <- Message { Type: "error",
                              Data: map[string]interface{} { "err" : err.Error() } }
+      return
     }
   }
   m3.log ( "start on %s", m3.local_box )
@@ -121,15 +124,34 @@ func ( m3 * m3rcury ) make_log_dirs ( ) {
   // the Boxes ----------------------------------
   err = find_or_make_dir ( m3.log_dir + "/boxes" )
   if err != nil {
-    m3.output <- Message { Type: "error",
-                           Data: map[string]interface{} { "err" : err.Error() } }
+    // Already existing is not an error.
+    if ! strings.Contains ( err.Error(), "exists" ) {
+      m3.output <- Message { Type: "error",
+                             Data: map[string]interface{} { "err" : err.Error() } }
+    }
+    return
   }
 
   // the Networks ----------------------------------
   err = find_or_make_dir ( m3.log_dir + "/networks" )
   if err != nil {
-    m3.output <- Message { Type: "error",
-                           Data: map[string]interface{} { "err" : err.Error() } }
+    // Already existing is not an error.
+    if ! strings.Contains ( err.Error(), "exists" ) {
+      m3.output <- Message { Type: "error",
+                             Data: map[string]interface{} { "err" : err.Error() } }
+    }
+    return
+  }
+
+  // the Routers ----------------------------------
+  err = find_or_make_dir ( m3.log_dir + "/routers" )
+  if err != nil {
+    // Already existing is not an error.
+    if ! strings.Contains ( err.Error(), "exists" ) {
+      m3.output <- Message { Type: "error",
+                             Data: map[string]interface{} { "err" : err.Error() } }
+    }
+    return
   }
 }
 
