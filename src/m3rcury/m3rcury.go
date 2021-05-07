@@ -1,8 +1,10 @@
 package M3rcury
 
 import ( 
+         "bytes"
          "fmt"
          "os"
+         "os/exec"
          "strings"
          "time"
        )
@@ -96,6 +98,19 @@ func ( m3 * m3rcury ) listen ( ) {
 
        case "router" :
          new_router ( m3.log_dir + "/routers",   msg, m3.start_time )
+
+       case "command" :
+         // TODO : only do ssh if box is not local.
+         cmd := exec.Command ( "ssh", msg.Data["box"].(string), msg.Data["cmd"].(string) )
+         var command_output bytes.Buffer
+         cmd.Stdout = & command_output
+         err := cmd.Run ( )
+         if err != nil {
+           fp ( os.Stdout, "☿: command error: %s\n", err.Error() )
+         } else {
+           fp(os.Stdout, "☿: command output: |%s|\n", command_output.String())
+         }
+
 
        default:
          fp ( os.Stdout, "%c : unknown command: |%s|\n", glyph, msg.Type )

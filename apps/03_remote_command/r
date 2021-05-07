@@ -1,0 +1,9 @@
+#! /bin/bash
+
+export M3RCURY_ROOT=${HOME}/m3rcury
+export GOPATH=${M3RCURY_ROOT}
+
+rm -rf ./log
+
+go run remote_command.go
+
