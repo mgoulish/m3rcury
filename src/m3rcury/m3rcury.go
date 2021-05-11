@@ -1,10 +1,8 @@
 package M3rcury
 
 import ( 
-         "bytes"
          "fmt"
          "os"
-         "os/exec"
          "strings"
          "time"
        )
@@ -82,35 +80,16 @@ func ( m3 * m3rcury ) listen ( ) {
         time.Sleep ( 2 * time.Second )
         m3.output <- Message { Type: "ping" }
       
-       case "box" :
-         name := msg.Data["name"]
-         name_str := name.(string)
-         box_in, box_out := new_box ( name_str, m3.log_dir + "/boxes", m3.start_time ) 
-         box := & m3_box { name   : name_str,
-                           input  : box_in,
-                           output : box_out,
-                         }
-         m3.boxes [ name_str ] = box
-         m3.log ( "made box %s", name_str )
-
-       case "network" :
-         new_network ( m3.log_dir + "/networks", msg, m3.start_time )
+       case "iperf" :
+         mode := msg.Data["mode"]
+         mode_str := mode.(string)
+         new_iperf ( mode_str,
+                     m3.log_dir + "/iperf", 
+                     m3.start_time ) 
+         m3.log ( "made iperf %s", mode_str )
 
        case "router" :
          new_router ( m3.log_dir + "/routers",   msg, m3.start_time )
-
-       case "command" :
-         // TODO : only do ssh if box is not local.
-         cmd := exec.Command ( "ssh", msg.Data["box"].(string), msg.Data["cmd"].(string) )
-         var command_output bytes.Buffer
-         cmd.Stdout = & command_output
-         err := cmd.Run ( )
-         if err != nil {
-           fp ( os.Stdout, "☿: command error: %s\n", err.Error() )
-         } else {
-           fp(os.Stdout, "☿: command output: |%s|\n", command_output.String())
-         }
-
 
        default:
          fp ( os.Stdout, "%c : unknown command: |%s|\n", glyph, msg.Type )
@@ -136,30 +115,8 @@ func ( m3 * m3rcury ) make_log_dirs ( ) {
   }
   m3.log ( "start on %s", m3.local_box )
 
-  // the Boxes ----------------------------------
-  err = find_or_make_dir ( m3.log_dir + "/boxes" )
-  if err != nil {
-    // Already existing is not an error.
-    if ! strings.Contains ( err.Error(), "exists" ) {
-      m3.output <- Message { Type: "error",
-                             Data: map[string]interface{} { "err" : err.Error() } }
-    }
-    return
-  }
-
-  // the Networks ----------------------------------
-  err = find_or_make_dir ( m3.log_dir + "/networks" )
-  if err != nil {
-    // Already existing is not an error.
-    if ! strings.Contains ( err.Error(), "exists" ) {
-      m3.output <- Message { Type: "error",
-                             Data: map[string]interface{} { "err" : err.Error() } }
-    }
-    return
-  }
-
-  // the Routers ----------------------------------
-  err = find_or_make_dir ( m3.log_dir + "/routers" )
+  // the iperfs ----------------------------------
+  err = find_or_make_dir ( m3.log_dir + "/iperf" )
   if err != nil {
     // Already existing is not an error.
     if ! strings.Contains ( err.Error(), "exists" ) {
