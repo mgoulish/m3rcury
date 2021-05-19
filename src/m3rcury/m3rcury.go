@@ -23,8 +23,8 @@ type Message_Channel chan Message
 
 
 
-// Mercury's view of a Box.
-type m3_box struct {
+// Mercury's view of a Process.
+type m3_process struct {
   name string
   input, output Message_Channel
 }
@@ -37,7 +37,7 @@ type m3rcury struct {
   log_dir    string
   log_file   string
   start_time float64
-  boxes      map [ string ] * m3_box 
+  processes  map [ string ] * m3_process 
   local_box  string
 }
 
@@ -52,7 +52,6 @@ func Start_M3rcury ( local_box string, log_dir string ) ( in, out Message_Channe
                     input      : in,
                     log_dir    : log_dir,
                     local_box  : local_box,
-                    boxes      : make ( map [ string ] * m3_box ),
                   }
   m3.log_file = m3.log_dir + "/m3rcury"
   now     := time.Now()
@@ -81,7 +80,7 @@ func ( m3 * m3rcury ) listen ( ) {
         m3.output <- Message { Type: "ping" }
       
        case "iperf" :
-         mode := msg.Data["mode"]
+         mode := msg.Data["mode"]    // server or client
          mode_str := mode.(string)
          new_iperf ( mode_str,
                      m3.log_dir + "/iperf", 
