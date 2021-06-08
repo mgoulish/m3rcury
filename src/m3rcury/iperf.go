@@ -25,14 +25,14 @@ type iperf struct {
 
 
 func new_iperf ( mode string, 
+                 to_main Message_Channel,
                  root_log_dir string, 
-                 start_time float64 ) ( in, out Message_Channel ) {
-  in  = make ( Message_Channel, 5 )
-  out = make ( Message_Channel, 5 )
+                 start_time float64 ) ( my_input Message_Channel ) {
+  my_input  = make ( Message_Channel, 5 )
 
   i := & iperf { mode       : mode,
-                 output     : out,
-                 input      : in,
+                 output     : to_main,
+                 input      : my_input,
                  log_dir    : root_log_dir + "/" + mode,
                  start_time : start_time,
                }
@@ -41,7 +41,7 @@ func new_iperf ( mode string,
   i.make_log_dirs ( )
   go i.listen ( )
 
-  return in, out
+  return my_input
 }
 
 

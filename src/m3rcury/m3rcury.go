@@ -26,7 +26,7 @@ type Message_Channel chan Message
 // Mercury's view of a Process.
 type m3_process struct {
   name string
-  input, output Message_Channel
+  input Message_Channel
 }
 
 
@@ -37,7 +37,7 @@ type m3rcury struct {
   log_dir    string
   log_file   string
   start_time float64
-  processes  map [ string ] * m3_process 
+  processes  map [ string ] *m3_process 
   local_box  string
 }
 
@@ -45,13 +45,14 @@ type m3rcury struct {
 
 
 
-func Start_M3rcury ( local_box string, log_dir string ) ( in, out Message_Channel ) {
+func M3rcury ( local_box string, log_dir string ) ( in, out Message_Channel ) {
   in  = make ( Message_Channel, 5 )
   out = make ( Message_Channel, 5 )
   m3 := & m3rcury { output     : out,
                     input      : in,
                     log_dir    : log_dir,
                     local_box  : local_box,
+                    processes  : make ( map[string] *m3_process, 0 ),
                   }
   m3.log_file = m3.log_dir + "/m3rcury"
   now     := time.Now()
@@ -75,17 +76,29 @@ func ( m3 * m3rcury ) listen ( ) {
     m3.output <- Message { Type: "ping" }
     switch ( msg.Type ) {
 
+      case "start" :
+
       case "pong" :
         time.Sleep ( 2 * time.Second )
         m3.output <- Message { Type: "ping" }
       
        case "iperf" :
-         mode := msg.Data["mode"]    // server or client
-         mode_str := mode.(string)
-         new_iperf ( mode_str,
-                     m3.log_dir + "/iperf", 
-                     m3.start_time ) 
-         m3.log ( "made iperf %s", mode_str )
+
+         // server or client
+         mode := msg.Data["mode"].(string)
+
+         iperf_channel := new_iperf ( mode,
+                                      m3.input,
+                                      m3.log_dir + "/iperf", 
+                                      m3.start_time ) 
+         // This implies that there can be only one iperf 
+         // instance of each mode, i.e. client or server, 
+         // which I believe is correct.
+         name := "iperf_" + mode
+         process := & m3_process { name:  name,
+                                   input: iperf_channel }
+         m3.processes[name] = process
+         m3.log ( "made iperf %s", mode )
 
        case "router" :
          new_router ( m3.log_dir + "/routers",   msg, m3.start_time )
