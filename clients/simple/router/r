@@ -1,0 +1,19 @@
+#! /bin/bash
+
+#export PN_TRACE_FRM=1
+#export PN_TRACE_RAW=1
+
+
+echo " "
+INSTALL_ROOT=/home/mick/latest/install
+PROTON_INSTALL_DIR=${INSTALL_ROOT}/proton
+DISPATCH_INSTALL_DIR=${INSTALL_ROOT}/dispatch
+export LD_LIBRARY_PATH=${DISPATCH_INSTALL_DIR}/lib:${PROTON_INSTALL_DIR}/lib64
+export PYTHONPATH=${DISPATCH_INSTALL_DIR}/lib/qpid-dispatch/python:${DISPATCH_INSTALL_DIR}/lib/python3.7/site-packages
+ROUTER=${DISPATCH_INSTALL_DIR}/sbin/qdrouterd
+
+#taskset -c 1 ${ROUTER} --config ./qdrouterd.conf 
+${ROUTER} --config ./qdrouterd.conf 
+
+
+

@@ -1,0 +1,15 @@
+#! /bin/bash
+
+export LD_LIBRARY_PATH=/home/mick/latest/install/dispatch/lib:/home/mick/latest/install/proton/lib64
+export PYTHONPATH=/home/mick/latest/install/dispatch/lib/qpid-dispatch/python:/home/mick/latest/install/dispatch/lib/python3.9/site-packages:/home/mick/latest/install/proton/lib64:/home/mick/latest/install/proton/lib64/proton/bindings/python
+
+
+# Start this sender by sending signal "kill -10 PID"
+
+
+N_MESSAGES=10000
+MESSAGE_SIZE=10000
+
+./sender  --name sender_00000 --host 0.0.0.0 --port 5672 --messages ${N_MESSAGES} --message_length ${MESSAGE_SIZE} --address addr_00000 &
+./sender  --name sender_00001 --host 0.0.0.0 --port 5672 --messages ${N_MESSAGES} --message_length ${MESSAGE_SIZE} --address addr_00001 &
+

@@ -1,0 +1,11 @@
+#! /bin/bash
+
+export LD_LIBRARY_PATH=/home/mick/latest/install/dispatch/lib:/home/mick/latest/install/proton/lib64
+export PYTHONPATH=/home/mick/latest/install/dispatch/lib/qpid-dispatch/python:/home/mick/latest/install/dispatch/lib/python3.9/site-packages:/home/mick/latest/install/proton/lib64:/home/mick/latest/install/proton/lib64/proton/bindings/python
+
+N_MESSAGES=10000
+MESSAGE_SIZE=10000
+
+./receiver  --name receiver_00000 --host 0.0.0.0 --port 5672 --messages ${N_MESSAGES} --message_length ${MESSAGE_SIZE} --address addr_00000 &
+./receiver  --name receiver_00001 --host 0.0.0.0 --port 5672 --messages ${N_MESSAGES} --message_length ${MESSAGE_SIZE} --address addr_00001 &
+
