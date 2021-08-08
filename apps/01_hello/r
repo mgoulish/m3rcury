@@ -1,8 +1,0 @@
-#! /bin/bash
-
-export M3RCURY_ROOT=${HOME}/m3rcury
-export GOPATH=${M3RCURY_ROOT}
-
-
-go run hello_m3rcury.go
-
