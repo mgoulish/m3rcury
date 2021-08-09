@@ -1,0 +1,9 @@
+#! /bin/bash
+
+#export PN_TRACE_FRM=1
+#export PN_TRACE_RAW=1
+
+
+./send 
+
+

@@ -1,0 +1,30 @@
+#! /bin/bash
+
+echo " BUILD DIRECT "
+cc  -I/home/mick/latest/qpid-proton/c/include -I/home/mick/latest/qpid-proton/c/src -I/home/mick/latest/qpid-proton/build/c/include -I/home/mick/latest/qpid-proton/build/c/src  -fvisibility=hidden -O2 -g -DNDEBUG   -Werror -Wall -pedantic-errors -Wstrict-prototypes -Wc++-compat -Wvla -Wsign-compare -Wwrite-strings -std=iso9899:1990 -pedantic -o ./direct.o   -c ./direct.c
+
+cc  -fvisibility=hidden -O2 -g -DNDEBUG  -rdynamic ./direct.o  -o direct  -Wl,-rpath,/home/mick/latest/qpid-proton/build/c /home/mick/latest/install/proton/lib64/libqpid-proton-proactor.so.1.7.1 /home/mick/latest/install/proton/lib64/libqpid-proton-core.so.10.11.0 -lpthread /usr/lib64/libssl.so /usr/lib64/libcrypto.so -lpthread /usr/lib64/libsasl2.so
+
+
+
+
+
+
+echo " BUILD SEND "
+cc  -I/home/mick/latest/qpid-proton/c/include -I/home/mick/latest/qpid-proton/c/src -I/home/mick/latest/qpid-proton/build/c/include -I/home/mick/latest/qpid-proton/build/c/src  -fvisibility=hidden -O2 -g -DNDEBUG   -Werror -Wall -pedantic-errors -Wstrict-prototypes -Wc++-compat -Wvla -Wsign-compare -Wwrite-strings -std=iso9899:1990 -pedantic -o send.o   -c ./send.c
+
+cc  -fvisibility=hidden -O2 -g -DNDEBUG  -rdynamic ./send.o  -o send -Wl,-rpath,/home/mick/latest/qpid-proton/build/c /home/mick/latest/install/proton/lib64/libqpid-proton-proactor.so.1.7.1 /home/mick/latest/install/proton/lib64/libqpid-proton-core.so.10.11.0 -lpthread /usr/lib64/libssl.so /usr/lib64/libcrypto.so -lpthread /usr/lib64/libsasl2.so
+
+
+
+
+
+echo " BUILD RECV "
+cc  -I/home/mick/latest/qpid-proton/c/include -I/home/mick/latest/qpid-proton/c/src -I/home/mick/latest/qpid-proton/build/c/include -I/home/mick/latest/qpid-proton/build/c/src  -fvisibility=hidden -O2 -g -DNDEBUG   -Werror -Wall -pedantic-errors -Wstrict-prototypes -Wc++-compat -Wvla -Wsign-compare -Wwrite-strings -std=iso9899:1990 -pedantic -o recv.o   -c ./recv.c
+
+cc  -fvisibility=hidden -O2 -g -DNDEBUG  -rdynamic ./recv.o  -o recv -Wl,-rpath,/home/mick/latest/qpid-proton/build/c /home/mick/latest/install/proton/lib64/libqpid-proton-proactor.so.1.7.1 /home/mick/latest/install/proton/lib64/libqpid-proton-core.so.10.11.0 -lpthread /usr/lib64/libssl.so /usr/lib64/libcrypto.so -lpthread /usr/lib64/libsasl2.so
+
+
+
+
+
